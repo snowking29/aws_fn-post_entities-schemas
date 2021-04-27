@@ -28,7 +28,6 @@ def handler(event, context):
         response = {"exception",str(e)}
     
     finally:
-        print("Response Body: ", response)
         return {
             "statusCode": 200,
             "body": json.dumps(response)
