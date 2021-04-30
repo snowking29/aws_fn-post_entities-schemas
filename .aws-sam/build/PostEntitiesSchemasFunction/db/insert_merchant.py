@@ -12,8 +12,12 @@ def merchant(event):
     print("Inicio registro de comercio en mongodb")
     body = json.loads(event['body'])
     headers = event['headers']
-    key = headers['key']
 
+    for header_field, header_field_value in headers.items():
+        if (header_field.lower() == "key" and len(header_field_value) != 0):
+            key = header_field_value
+            
+    print("KEEEEY: ", key)
     conn = mongodb_conn()
 
     conn = mongodb_conn()
@@ -21,10 +25,12 @@ def merchant(event):
     if conn is None:
         #No conexión, salida anticipada
         return
-    collection = mongodb_collection(conn,"schema_service","merchant")
-    if collection is None:
-        #Collection invalido, salida anticipada
-        return
+
+    try:
+        collection = conn.schema_service.merchant
+    except py.errors.CollectionInvalid as e:
+        traceback.print_exc()
+        print("No se encontró la colección en la base de datos: %s" %e)
     
     body.setdefault("key", key)
 

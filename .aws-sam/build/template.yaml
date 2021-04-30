@@ -9,9 +9,28 @@ Globals:
   Function:
     Timeout: 15
 Resources:
-  POSTFunction:
+  PostEntitiesSchemasFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: PostEntitiesSchemas
+      Role: arn:aws:iam::023781179612:role/AdminAccessRole
       Handler: handler.handler
       Runtime: python3.8
-      CodeUri: POSTFunction
+      Events:
+        PostEntitiesSchemasAPI:
+          Type: Api
+          Properties:
+            Path: /postschema
+            Method: post
+      CodeUri: PostEntitiesSchemasFunction
+Outputs:
+  PostEntitiesSchemasAPI:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod//postschema/
+  PostEntitiesSchemasFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - PostEntitiesSchemasFunction
+      - Arn

@@ -7,8 +7,7 @@ from db.insert_application import application
 from db.insert_issuer import issuer
 
 def handler(event, context):
-    print("DEBUG APPLICATION EVENT")
-    #print("Application Event: ", json.loads(event['body']))
+    print("Application Event: asdasdsad")
     headers = event['headers']
     
     for header_field, header_field_value in headers.items():

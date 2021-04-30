@@ -1,6 +1,7 @@
 import json
 import bson
 import traceback
+import pymongo as py
 from time import time
 from db_util.get_connection import mongodb_conn
 from db_util.get_collection import mongodb_collection
@@ -12,17 +13,22 @@ def issuer(event):
     
     body = json.loads(event['body'])
     headers = event['headers']
-    key = headers['key']
+    
+    for header_field, header_field_value in headers.items():
+        if (header_field.lower() == "key" and len(header_field_value) != 0):
+            key = header_field_value
 
     conn = mongodb_conn()
     print("Info Base de datos: ", conn.server_info())
     if conn is None:
         #No conexión, salida anticipada
         return
-    collection = mongodb_collection(conn,"schema_service","issuer")
-    if collection is None:
-        #Collection invalido, salida anticipada
-        return
+
+    try:
+        collection = conn.schema_service.issuer
+    except py.errors.CollectionInvalid as e:
+        traceback.print_exc()
+        print("No se encontró la colección en la base de datos: %s" %e)
     
     body.setdefault("key", key)
 

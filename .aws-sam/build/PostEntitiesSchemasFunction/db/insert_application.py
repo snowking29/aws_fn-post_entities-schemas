@@ -1,6 +1,7 @@
 import json
 import bson
 import traceback
+import pymongo as py
 from time import time
 from db_util.get_connection import mongodb_conn
 from db_util.get_collection import mongodb_collection
@@ -11,18 +12,24 @@ def application(event):
     print("Inicio registro de aplicacion en mongodb")
     body = json.loads(event['body'])
     headers = event['headers']
-    key = headers['key']
-    schema_type = headers['schemaType']
+    
+    for header_field, header_field_value in headers.items():
+        if (header_field.lower() == "key" and len(header_field_value) != 0):
+            key = header_field_value
+        if (header_field.lower() == "schematype" and len(header_field_value) != 0):
+            schema_type = header_field_value
 
     conn = mongodb_conn()
     print("Info Base de datos: ", conn.server_info())
     if conn is None:
         #No conexión, salida anticipada
         return
-    collection = mongodb_collection(conn,"schema_service","application")
-    if collection is None:
-        #Collection invalido, salida anticipada
-        return
+
+    try:
+        collection = conn.schema_service.application
+    except py.errors.CollectionInvalid as e:
+        traceback.print_exc()
+        print("No se encontró la colección en la base de datos: %s" %e)
 
     result_find_register = mongodb_document(conn,key)
     print("¿Se encontró key?: ", result_find_register)

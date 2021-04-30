@@ -3,7 +3,7 @@ import traceback
 import pymongo as py
 def mongodb_document(conn,key):
     try:
-        db = conn.configuration_service
+        db = conn.schema_service
         all_collections = db.list_collection_names()
         registers = []
         
@@ -11,8 +11,7 @@ def mongodb_document(conn,key):
             get_register = db[collection].find({"key":key})
             for register in get_register:
                 registers.append(register)
-                
-        if not registers:
+        if len(registers) == 0:
             foundkey = False
         else:
             foundkey = True
